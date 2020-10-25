@@ -1,0 +1,15 @@
+version: "3"
+services:
+  app:
+    build: ./app
+    tty: true
+    command: /bin/ash
+    ports:
+      - 8080:8080
+    working_dir: /go/src/github.com/blacknikka/timestream-golang/
+    volumes:
+      - "./app/src:/go/src/github.com/blacknikka/timestream-golang/"
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
