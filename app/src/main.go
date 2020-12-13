@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/timestreamquery"
 
+	"github.com/blacknikka/timestream-golang/timestream"
+
 	"golang.org/x/net/http2"
 )
 
@@ -46,14 +48,10 @@ func main() {
 	// read service
 	querySvc := timestreamquery.New(sess)
 	query := `SELECT * FROM sampleDB.IoT limit 5`
-	queryInput := &timestreamquery.QueryInput{
-		QueryString: aws.String(query),
-	}
 
 	fmt.Println("Submitting a query:")
-	fmt.Println(queryInput)
-	// submit the query
-	queryOutput, err := querySvc.Query(queryInput)
+	tsQuery := timestream.TimestreamQuery{}
+	queryOutput, err := tsQuery.Query(querySvc, query)
 
 	if err != nil {
 		fmt.Println("Error:")
