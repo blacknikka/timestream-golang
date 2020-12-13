@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/timestreamquery"
 	"github.com/aws/aws-sdk-go/service/timestreamwrite"
 
 	"golang.org/x/net/http2"
@@ -42,12 +43,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// write service
 	writeSvc := timestreamwrite.New(sess)
 
 	// 事前に作ってあるdatabase名を取得する
 	// Describe database.
 	describeDatabaseInput := &timestreamwrite.DescribeDatabaseInput{
-		DatabaseName: aws.String("mysample"),
+		DatabaseName: aws.String("sampleDB"),
 	}
 	describeDatabaseOutput, err := writeSvc.DescribeDatabase(describeDatabaseInput)
 
@@ -58,4 +61,23 @@ func main() {
 		fmt.Println("Describe database is successful, below is the output:")
 		fmt.Println(describeDatabaseOutput)
 	}
+
+	// read service
+	querySvc := timestreamquery.New(sess)
+	query := `SELECT * FROM sampleDB.IoT limit 5`
+	queryInput := &timestreamquery.QueryInput{
+		QueryString: aws.String(query),
+	}
+
+	fmt.Println("Submitting a query:")
+	fmt.Println(queryInput)
+	// submit the query
+	queryOutput, err := querySvc.Query(queryInput)
+
+	if err != nil {
+		fmt.Println("Error:")
+		fmt.Println(err)
+	}
+
+	fmt.Println(queryOutput)
 }
