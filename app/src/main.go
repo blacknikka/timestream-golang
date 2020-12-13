@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/timestreamquery"
 	"github.com/aws/aws-sdk-go/service/timestreamwrite"
-
 	"github.com/blacknikka/timestream-golang/timestream"
 
 	"golang.org/x/net/http2"
@@ -51,12 +50,11 @@ func main() {
 	writeSvc := timestreamwrite.New(sess)
 
 	databaseName := "sampleDB"
-	tableName := "IoT"
+	tableName := "utilization"
 
 	now := time.Now()
 	currentTimeInMilliSeconds := now.UnixNano()
 	currentTimeInMilliSeconds = int64(currentTimeInMilliSeconds / (1000 * 1000))
-	fmt.Println(currentTimeInMilliSeconds)
 
 	writeRecordsInput := &timestreamwrite.WriteRecordsInput{
 		DatabaseName: aws.String(databaseName),
@@ -79,7 +77,7 @@ func main() {
 				},
 				MeasureName:      aws.String("cpu_utilization"),
 				MeasureValue:     aws.String("13.5"),
-				MeasureValueType: aws.String("DOUBLE"),
+				MeasureValueType: aws.String(timestreamwrite.MeasureValueTypeDouble),
 				Time:             aws.String(strconv.FormatInt(currentTimeInMilliSeconds, 10)),
 				TimeUnit:         aws.String(timestreamwrite.TimeUnitMilliseconds),
 			},
@@ -100,14 +98,15 @@ func main() {
 				},
 				MeasureName:      aws.String("memory_utilization"),
 				MeasureValue:     aws.String("40"),
-				MeasureValueType: aws.String("DOUBLE"),
+				MeasureValueType: aws.String(timestreamwrite.MeasureValueTypeDouble),
 				Time:             aws.String(strconv.FormatInt(currentTimeInMilliSeconds, 10)),
 				TimeUnit:         aws.String(timestreamwrite.TimeUnitMilliseconds),
 			},
 		},
 	}
 
-	_, err = writeSvc.WriteRecords(writeRecordsInput)
+	insert := timestream.TimestreamInsert{}
+	err = insert.Insert(writeSvc, writeRecordsInput)
 
 	if err != nil {
 		fmt.Println("Error:")
