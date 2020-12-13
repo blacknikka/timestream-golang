@@ -65,6 +65,12 @@ func main() {
 		select {
 		case <-t.C:
 			loopMax := 50
+			fmt.Printf(
+				"create %d data at %d. => %s\n",
+				loopMax,
+				baseTimeInMilliSeconds,
+				time.Unix(0, baseTimeInMilliSeconds*1000*1000),
+			)
 
 			// create 2ms granularly array
 			insertData := struct {
